@@ -23,6 +23,7 @@ my $s =  IO::Socket::SSL->new(
     SSL_verify_mode => SSL_VERIFY_NONE,
    );
 
+die "error $addr\n" unless $s;
 $s->print(join('', map{ "$_\r\n" }
                "GET $file HTTP/1.0",
                "Host: $host",
