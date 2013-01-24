@@ -1,0 +1,65 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+
+# Copyright (c) 2013
+# Author: Jeff Weisberg <jaw @ solvemedia.com>
+# Created: 2013-Jan-23 00:10 (EST)
+# Function: make various files that use stats
+
+use strict;
+
+my($hf, $cf, $sf) = map {
+    open(my $f, '>', $_) || die "cannot open $_: $!\n";
+    print $f "// auto generated - do not edit\n\n";
+    $f;
+} @ARGV;
+
+
+while(<DATA>){
+    chop;
+
+    # for class DNS_Stats
+    print $hf "\tint64_t\t\tn_$_;\n";
+
+    if( /\[(\d+)/ ){
+        my $n = $1;
+        my $b = $_;
+        $b =~ s/\[.*//;
+        cf("$_.$b", "n_$b\[$_]") for (0 .. $n-1);
+        sf("$b$_", "n_$b\[$_]") for (0 .. $n-1);
+    }else{
+        cf($_, "n_$_");
+        sf($_, "n_$_");
+    }
+}
+
+sub cf {
+    my $n = shift;
+    my $v = shift;
+
+    # for chaos mib
+    print $cf qq[\t{ "$n.stats.server.", 1, 'q', & net_stats.$v },\n];
+}
+
+sub sf {
+    my $n = shift;
+    my $v = shift;
+
+    # for console stats command
+    print $sf qq[\t{ "$n", 'q', & net_stats.$v },\n];
+}
+
+
+# these are the stats we track + report:
+__END__
+requests
+tcp
+drop
+edns
+client_subnet_ipv4
+client_subnet_ipv6
+rcode[8]
+glb
+glb_nolocation
+glb_failover
+glb_failover_fail

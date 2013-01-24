@@ -1,0 +1,153 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+
+# Copyright (c) 2013
+# Author: Jeff Weisberg <jaw @ solvemedia.com>
+# Created: 2013-Jan-15 10:45 (EST)
+# Function: 
+#
+# $Id$
+
+use Text::CSV;
+use Math::Trig qw(deg2rad pi great_circle_distance asin acos);
+
+use strict;
+
+my $OUTFILE = '/tmp/data_ipv6.mdb';
+
+my $BLKFILE = '/home/bagel/u/jaw/tmp/GeoLiteCityv6.csv';
+
+
+my %DC = (
+    ccsphl	=> {
+        lat => 39.964622,
+        lon => -75.161762,
+    },
+
+    qtssjc => {
+        lat => 37.392664,
+        lon => -121.978455,
+    },
+
+    savchi => {
+        lat => 41.854323,
+        lon => -87.618531,
+    },
+
+    swiams => {
+        lat => 52.304136,
+        lon => 4.939256,
+    },
+   );
+
+my $HEADSIZE = 8192;
+my %LOC;
+my $nrec = 0;
+
+my @DC = (keys %DC);
+
+################################################################
+
+open(TMP, "> $OUTFILE.tmp.$$") || fatal("cannot open tmp file: $!");
+binmode(TMP, ':raw');
+# skip header
+syswrite(TMP, "\0" x $HEADSIZE);
+
+read_blkfile();
+
+do_header();
+close TMP;
+
+rename "$OUTFILE.tmp.$$", $OUTFILE;
+
+################################################################
+
+# 2001:208::,2001:208:ffff:ffff:ffff:ffff:ffff:ffff,42540529360620350178005905068154421248,42540529439848512692270242661698371583,SG,,,1.3667,103.8000,,0,0
+
+sub read_blkfile {
+
+    open(my $f, $BLKFILE) || die "cannot open file: $!\n";
+    <$f>; <$f>;
+
+    my $csv = Text::CSV->new();
+
+    while(my $l = $csv->getline($f)){
+        my $loc = { lat => $l->[7], lon => $l->[8] };
+        print STDERR  "$l->[0] => $l->[2]\n" unless $loc;
+        next unless $loc;
+        my $masklen = masklen( $l->[0], $l->[1] );
+
+        my $rec = pack('a8sS', ipv6addr($l->[0]), $masklen, 0)
+          . join('', map { pack('l', pingtime($_, $DC{$_}, $loc)) } @DC);
+
+        print TMP $rec;
+        $nrec ++;
+    }
+}
+
+sub ipv6addr {
+    my $ip = shift;
+
+    $ip =~ s/::.*//;
+    my @b = split /:/, $ip;
+
+    return join('', map { pack('n', $_) } @b);
+
+}
+
+sub masklen {
+    my $a = shift;
+    my $z = shift;
+
+    return 32;
+}
+
+sub pingtime {
+    my $dc   = shift;
+    my $loc1 = shift;
+    my $loc2 = shift;
+
+    my $dist = haversine( $loc1->{lat}, $loc1->{lon}, $loc2->{lat}, $loc2->{lon} );
+
+    return $dist;
+}
+
+
+sub haversine {
+  my ($lat1, $long1, $lat2, $long2) = @_;
+  my $r = 3956;
+
+  my $dlong = deg2rad($long1) - deg2rad($long2);
+  my $dlat  = deg2rad($lat1)  - deg2rad($lat2);
+
+  my $a = sin($dlat/2)**2 +cos(deg2rad($lat1))
+                    * cos(deg2rad($lat2))
+                    * sin($dlong/2)**2;
+
+  my $c = 2 * (asin(sqrt($a)));
+
+  # print STDERR ">> $lat1, $long1, $lat2, $long2 => $a,$c\n";
+  return $r * $c;
+}
+
+sub do_header {
+
+    my $hsize = 128;
+    my $dcs = join('', map { "$_\0" } @DC);
+
+    my $rec = pack('LL ll qq qq',
+                   0x41436d46, 1,		# magic, version
+                   6, (12 + 4 * @DC),		# ipver, recsize
+                   $hsize, (scalar @DC),	# dc pos, #dc
+                   $HEADSIZE, $nrec,		# rec pos, #rec
+                  );
+
+    $rec .= "\0" x ($hsize - length($rec)) . $dcs;
+    $rec .= "\0" x ($HEADSIZE - length($rec));
+
+    seek TMP, 0, 0;
+    syswrite(TMP, $rec);
+
+}
+
+

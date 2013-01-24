@@ -1,0 +1,44 @@
+# Copyright (c) 2013
+# Author: Jeff Weisberg <jaw @ solvemedia.com>
+# Created: 2013-Jan-04 12:46 (EST)
+# Function: example dns server config
+
+
+port            53
+console         5301
+environment	prod
+
+udp_threads     5
+tcp_threads     20
+
+ipv4data        /tmp/data_ipv4.mdb
+ipv6data        /tmp/data_ipv6.mdb
+
+monpath         ../monbin
+
+logpercent      0
+logfile         /tmp/dnslog
+
+allow           10.123.0.0/16
+
+error_mailto	noc@example.com
+error_mailfrom	"DNS Daemon" <nobody@example.com>
+
+debuglevel	8
+
+#debug	        network
+#debug          dns
+#debug          glb
+#debug          zdb
+#debug          console
+#debug          zonefile
+#debug          mmdb
+#debug          mon
+#debug          config
+
+
+# hexdump packets
+#trace           network
+
+zone            example.com             ../eg/example.zone
+

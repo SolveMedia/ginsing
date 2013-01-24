@@ -1,0 +1,39 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+
+# Copyright (c) 2013
+# Author: Jeff Weisberg <jaw @ solvemedia.com>
+# Created: 2013-Jan-22 14:09 (EST)
+# Function: check if http is working
+
+use IO::Socket::INET;
+use strict;
+
+my($addr, $port, $host, $file) = @ARGV;
+
+$port ||= 80;
+$host ||= $addr;
+$file ||= '/robots.txt';
+
+my $s = IO::Socket::INET->new(
+    PeerAddr	=> $addr,
+    PeerPort	=> $port,
+    Proto	=> 'tcp',
+   );
+
+die "error $addr\n" unless $s;
+$s->print(join('', map{ "$_\r\n" }
+               "GET $file HTTP/1.0",
+               "Host: $host",
+               "User-Agent: ginsing/dns monitor",
+               "Connection: close",
+               "Accept: */*",
+               "",
+               ));
+
+my $buf;
+$s->read($buf, 1024);
+my($proto, $code, $msg) = split /\s+/, $buf;
+
+exit( ($code =~ /^[23]/) ? 0 : 1 );
+

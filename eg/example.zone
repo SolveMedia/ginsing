@@ -1,0 +1,68 @@
+;
+; example zone file
+;
+
+@       3600    SOA     ns1.example.com. hostmaster.example.com. (
+                                20130158        ; serial
+                                8H              ; refresh
+                                2H              ; retry
+                                4W              ; expire
+                                1D )            ; min
+
+                NS      ns1.example.com.
+                NS      ns2
+                NS      ns3.offsite.com.
+
+host1           CNAME   deli1
+host2           CNAME   deli2.example.com.
+host3           CNAME   deli3.offsite.com.
+host4           CNAME   nonexistent
+
+
+ns1             A       10.0.1.1
+ns2             A       10.0.1.2
+                AAAA    2001:abcd::2
+
+deli1           A       10.0.2.1
+deli2           A       10.0.2.2
+
+mail            MX      10 mail1
+                MX      20 mail2
+
+
+mail1           A       10.0.3.1
+mail2           A       10.0.3.2
+
+*.dev           A       10.0.3.1
+
+
+1.2.3.4         PTR     server-1-2-3-4
+
+sub             NS      ns1.offsite.com.
+                NS      ns2.offsite.com.
+
+
+; ################################################################
+
+www.ccsphl      120     A               8.20.87.8       {  60 http 80 www.example.com /robots.txt }
+www.qtssjc      120     A               8.12.155.8      {  60 http 80 www.example.com /robots.txt }
+www.savchi      120     A               10.0.3.1        {  60 http }
+www.swiams      120     A               10.0.4.1        {  60 http }
+www.nowhere     120     CNAME           www.google.com.
+
+; ################################################################
+
+wwwrr           120     GLB:RR          www.ccsphl
+wwwrr           120     GLB:RR          www.qtssjc
+
+; ################################################################
+
+www             120     GLB:MM  	www.ccsphl   ccsphl     1.0  :rrgood
+www             120     GLB:MM  	www.qtssjc   qtssjc     1.0  :rrgood
+www             120     GLB:MM          www.savchi   savchi     1.0  :rrgood
+www             120     GLB:MM          www.swiams   swiams     1.0  :rrgood
+www             120     GLB:MM          www.savchi   :unknown
+www             120     GLB:MM          www.nowhere  :lastresort
+
+; ################################################################
+
