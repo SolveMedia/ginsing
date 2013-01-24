@@ -143,6 +143,10 @@ mon_run(void){
     running = 0;
 
     install_handler(SIGPIPE,  SIG_DFL);
+    install_handler(SIGHUP,   SIG_DFL);
+    install_handler(SIGINT,   SIG_DFL);
+    install_handler(SIGQUIT,  SIG_DFL);
+    install_handler(SIGTERM,  SIG_DFL);
 
     DEBUG("starting");
 
