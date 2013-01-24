@@ -144,13 +144,15 @@ mon_run(void){
 
     install_handler(SIGPIPE,  SIG_DFL);
 
+    DEBUG("starting");
+
     // close any open files
     for(int i=4; i<256; i++) close(i);
 
     while(1){
         time_t now = lr_now();
         int len    = zdb->monitored.size();
-        int rx     = random() % len;
+        int rx     = len ? random() % len : 0;
 
         for(int i=0; i<len; i++){
             int n = (i + rx) % len;
