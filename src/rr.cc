@@ -129,9 +129,15 @@ RRCompString::set_name(string dest, string *zonename){
         // absolute name in zone
         same_zone = 1;
         fqdn      = dest;
-        name      = dest.substr(0, zp-1);
-        cvt_name_to_wire(&name, &name_wire);
-        DEBUG("absol, same %s -> %s", name.c_str(), fqdn.c_str());
+        if( zp > 0 ){
+            name      = dest.substr(0, zp-1);
+            cvt_name_to_wire(&name, &name_wire);
+        }else{
+            // x CNAME zone.
+            name      = "";
+            name_wire = "";
+        }
+        DEBUG("absol, same %d, %s -> %s", zp, name.c_str(), fqdn.c_str());
         return;
     }
 
