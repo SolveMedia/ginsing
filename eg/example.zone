@@ -3,7 +3,7 @@
 ;
 
 @       3600    SOA     ns1.example.com. hostmaster.example.com. (
-                                20130158        ; serial
+                                20130163        ; serial
                                 8H              ; refresh
                                 2H              ; retry
                                 4W              ; expire
@@ -41,6 +41,8 @@ mail2           A       10.0.3.2
 sub             NS      ns1.offsite.com.
                 NS      ns2.offsite.com.
 
+
+xxx             CNAME   example.com.
 
 ; ################################################################
 
