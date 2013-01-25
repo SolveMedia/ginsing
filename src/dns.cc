@@ -94,6 +94,8 @@ status_reply(NTD *ntd){
     DNS_Hdr *resp = (DNS_Hdr*) ntd->respb.buf;
     DNS_Hdr *qury = (DNS_Hdr*) ntd->querb.buf;
 
+    DEBUG("status reply");
+    INCSTAT(ntd, n_status);
     memset( ntd->respb.buf, 0, sizeof(DNS_Hdr) );
 
     int rd = ntohs(qury->flags) & FLAG_RD;

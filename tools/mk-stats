@@ -56,6 +56,7 @@ requests
 tcp
 drop
 chaos
+status
 edns
 client_subnet_ipv4
 client_subnet_ipv6
