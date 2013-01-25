@@ -97,7 +97,7 @@ main(int argc, char **argv){
      if( flag_foreground){
 	 daemon_siginit();
      }else{
-	 prev_status = daemonize(10, MYNAME, save_argc, save_argv);
+	 prev_status = daemonize(10, MYNAME "d", save_argc, save_argv);
      }
 
      VERBOSE( "starting." );
