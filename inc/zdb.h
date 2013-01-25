@@ -258,6 +258,7 @@ class RRSet {
 public:
     vector<RR*>			rr;
     bool			wildcard;
+    bool			delegation;
     string			name;		// for searching
     string			fqdn;		// for searching
     Zone *			zone;
@@ -353,6 +354,7 @@ private:
     int insert(ZDB *, RR*, string *);
     int analyze(ZDB*);
     bool zonematch(const char *, int)      const;
+    void wire_ns(ZDB*);
 
 public:
     RRSet *find_rrset(string *, bool wild) const;

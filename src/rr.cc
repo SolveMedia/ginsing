@@ -55,7 +55,6 @@ RR::make(string *lab, int kl, int ty, int tt, bool wild){
     if( ty == TYPE_NS && ! lab->empty() ){
         // delegated subdomain
         rr->delegation = 1;
-        wild = 1;
     }
 
     rr->type     = ty;

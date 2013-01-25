@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <algorithm>
+
 ZDB *zdb = 0;
 
 
@@ -41,6 +43,7 @@ RRSet::RRSet(Zone* z, string *l, bool wp){
     wildcard = wp;
     name = *l;
     zone = z;
+    delegation = 0;
     if( l->empty() )
         fqdn = zone->zonename;
     else
@@ -91,7 +94,11 @@ Zone::insert(ZDB *db, RR *rr, string *label){
             return 0;
         }
         rrset.push_back(rrs);
-        db->insert(rrs);
+
+        // delegated subdomains will be wired later (zdb::analyze)
+        if( ! rrs->delegation )
+            db->insert(rrs);
+
         DEBUG("new RRSet wild %d, name %s, zone %s; fqdn %s", wildp, label->c_str(), zonename.c_str(), rrs->fqdn.c_str());
     }
 
@@ -171,6 +178,7 @@ RRSet_GLB_Hash::is_compat(RR *r) const {
 void
 RRSet::add_rr(RR *r){
     rr.push_back(r);
+    if( r->delegation ) delegation = 1;
 }
 
 //################################################################
@@ -233,12 +241,48 @@ RR_MX::analyze(Zone *z){
     }
 }
 
+static bool
+zone_compare_length(Zone *a, Zone *b){
+
+    return a->zonename.length() > b->zonename.length();
+}
+
+
+// figure out what to do with delegated subdomains
+//   if we host it - ignore the rrs
+//   if we don't   - treat it as a wilcard + handle it
+void
+Zone::wire_ns(ZDB *db){
+
+    for(int i=0; i<rrset.size(); i++){
+        RRSet *rs = rrset[i];
+        if( ! rs->delegation ) continue;
+
+        Zone *z = db->find_zone( rs->fqdn.c_str() );
+        DEBUG("subdomain %s => %x => %s", rs->fqdn.c_str(), z, z? z->zonename.c_str() : "");
+
+        if( z && z->zonename == rs->fqdn ){
+            // ignore record
+            DEBUG("subdomain %s is local", rs->fqdn.c_str());
+        }else{
+            DEBUG("wiring delegated subdomain %s", rs->fqdn.c_str());
+            rs->wildcard = 1;
+            db->insert(rs);
+        }
+    }
+}
 
 int
 ZDB::analyze(){
 
-    // RSN
-    // sort wildcards ?
+    // sort zones, longest first
+    std::sort( zone.begin(), zone.end(), zone_compare_length );
+
+    // wire NS delegations
+    for(int i=0; i<zone.size(); i++){
+        zone[i]->wire_ns(this);
+    }
+
 
     return 1;
 }

@@ -477,7 +477,7 @@ dns_process(NTD *ntd){
     RRSet *rrs = zdb->find_rrset( ntd->querd.name );
     Zone  *z   = rrs ? rrs->zone : zdb->find_zone( ntd->querd.name );
 
-    DEBUG("found rrs %x z %x", rrs, z);
+    DEBUG("found rrs %x z %x (%s)", rrs, z, z? z->zonename.c_str() : "-");
 
     if( !z ) return error_refused(ntd);
 
