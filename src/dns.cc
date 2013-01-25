@@ -29,14 +29,20 @@
 extern void log_request(NTD*);
 
 #define error_invalid(n) error_without_copy(n, RCODE_FORMAT)
-#define error_notimp(n)  error_without_copy(n, RCODE_NOTIMP)
-#define error_refused(n) error_without_copy(n, RCODE_REFUSED)
-#define error_mybad(n)   error_without_copy(n, RCODE_IFAIL)
+#define error_notimp(n)  error_with_copy(n, RCODE_NOTIMP)
+#define error_refused(n) error_with_copy(n, RCODE_REFUSED)
+#define error_mybad(n)   error_with_copy(n, RCODE_IFAIL)
 
 int mypid;
 
 void
 dns_init(void){ mypid = getpid(); }
+
+inline void
+maybe_log(NTD *ntd){
+    if( with_probability(config->logpercent / 100.0) )
+        log_request(ntd);
+}
 
 static int
 error_drop(NTD *ntd){
@@ -62,6 +68,25 @@ error_without_copy(NTD *ntd, int rcode){
     resp->flags = htons( (rcode << RCODE_SHIFT) | FLAG_RESPONSE | rd );
 
     return ntd->respb.datalen = sizeof(DNS_Hdr);
+}
+
+static int
+error_with_copy(NTD *ntd, int rcode){
+    DNS_Hdr *resp = (DNS_Hdr*) ntd->respb.buf;
+    DNS_Hdr *qury = (DNS_Hdr*) ntd->querb.buf;
+
+    DEBUG("sending error %d", rcode);
+    INCSTAT(ntd, n_rcode[rcode]);
+
+    memset( ntd->respb.buf, 0, sizeof(DNS_Hdr) );
+    ntd->copy_question();
+
+    ntd->respd.flags |= rcode << RCODE_SHIFT;
+    ntd->fill_header();
+
+    maybe_log(ntd);
+
+    return ntd->respb.datalen;
 }
 
 static int
@@ -492,8 +517,7 @@ dns_process(NTD *ntd){
     ntd->fill_header();
 
     // log some requests
-    if( with_probability(config->logpercent / 100.0) )
-        log_request(ntd);
+    maybe_log(ntd);
 
     return ntd->respb.datalen;
 
