@@ -84,7 +84,7 @@ log_request(NTD *ntd){
             ntd->querd.name, ntd->respd.flags & ~FLAG_RESPONSE, ntd->respb.datalen);
 
     if( ntd->edns.udpsize ){
-        fprintf("edns %d ", ntd->edns.udpsize);
+        fprintf(f, "edns %d ", ntd->edns.udpsize);
     }
 
     switch( ntd->edns.addr_family ){
