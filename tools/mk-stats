@@ -55,6 +55,7 @@ __END__
 requests
 tcp
 drop
+chaos
 edns
 client_subnet_ipv4
 client_subnet_ipv6

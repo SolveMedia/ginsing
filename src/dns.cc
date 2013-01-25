@@ -432,6 +432,9 @@ reply_chaos(NTD *ntd){
     ntd->respd.flags |= rcode << RCODE_SHIFT;
     ntd->fill_header();
 
+    INCSTAT(ntd, n_chaos);
+    maybe_log(ntd);
+
     return ntd->respb.datalen;
 }
 
