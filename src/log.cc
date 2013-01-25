@@ -78,7 +78,14 @@ log_request(NTD *ntd){
         break;
     }
 
-    fprintf(f, " %s %x %d ", ntd->querd.name, ntd->respd.flags & ~FLAG_RESPONSE, ntd->respb.datalen);
+
+    fprintf(f, " %s %s %x %d ",
+            (ntd->querb.bufsize == UDPBUFSIZ) ? "udp" : "tcp",
+            ntd->querd.name, ntd->respd.flags & ~FLAG_RESPONSE, ntd->respb.datalen);
+
+    if( ntd->edns.udpsize ){
+        fprintf("edns %d ", ntd->edns.udpsize);
+    }
 
     switch( ntd->edns.addr_family ){
     case EDNS0_FAMILY_IPV4:
