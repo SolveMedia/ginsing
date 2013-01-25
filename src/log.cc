@@ -79,9 +79,10 @@ log_request(NTD *ntd){
     }
 
 
-    fprintf(f, " %s %s %x %d ",
+    fprintf(f, " %s %s/%d-%d %x %d ",
             (ntd->querb.bufsize == UDPBUFSIZ) ? "udp" : "tcp",
-            ntd->querd.name, ntd->respd.flags & ~FLAG_RESPONSE, ntd->respb.datalen);
+            ntd->querd.name, ntd->querd.klass, ntd->querd.type,
+            ntd->respd.flags & ~FLAG_RESPONSE, ntd->respb.datalen);
 
     if( ntd->edns.udpsize ){
         fprintf(f, "edns %d ", ntd->edns.udpsize);
