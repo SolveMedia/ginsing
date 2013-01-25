@@ -134,7 +134,7 @@ cmd_rps(Console *con, const char *cmd, int len){
 }
 
 static void
-output_stat(Console *con, int idx, bool align){
+output_stat(Console *con, int idx, bool table){
     char buf[32];
     const char *v;
 
@@ -159,14 +159,13 @@ output_stat(Console *con, int idx, bool align){
         return;
     }
 
-    con->output(statscmd[idx].name);
-
-    if( align ){
+    if( table ){
+        con->output(statscmd[idx].name);
         int l = strlen(statscmd[idx].name);
         for(int i=l; i<24; i++) con->output(" ");
+        con->output(" ");
     }
 
-    con->output(" ");
     con->output(v);
     con->output("\n");
 }
