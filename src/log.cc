@@ -78,7 +78,7 @@ log_request(NTD *ntd){
         break;
     }
 
-    fprintf(f, " %s %d %d ", ntd->querd.name, ntd->respd.flags, ntd->respb.datalen);
+    fprintf(f, " %s %x %d ", ntd->querd.name, ntd->respd.flags & ~FLAG_RESPONSE, ntd->respb.datalen);
 
     switch( ntd->edns.addr_family ){
     case EDNS0_FAMILY_IPV4:
