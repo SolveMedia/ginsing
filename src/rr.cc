@@ -37,6 +37,7 @@ RR::make(string *lab, int kl, int ty, int tt, bool wild){
         case TYPE_PTR: 	    rr = new RR_PTR;		break;
         case TYPE_MX: 	    rr = new RR_MX;		break;
         case TYPE_TXT:	    rr = new RR_TXT;		break;
+        case TYPE_ALIAS:    rr = new RR_Alias;		break;
         case TYPE_GLB_RR:   rr = new RR_GLB_RR;		break;
         case TYPE_GLB_GEO:  rr = new RR_GLB_Geo;	break;
         case TYPE_GLB_MM:   rr = new RR_GLB_MM;		break;
@@ -263,6 +264,14 @@ RR_Compress::configure(InputF *f, Zone *z, string *rspec){
     return 0;
 }
 
+int
+RR_Alias::configure(InputF *f, Zone *z, string *rspec){
+
+    target.assign( *rspec );
+    DEBUG("alias => %s", rspec->c_str());
+    return 0;
+}
+
 //################################################################
 
 int
@@ -282,11 +291,11 @@ RRSet::add_answers(NTD *ntd, int qkl, int qty) const {
         if( r->klass == qkl && r->can_satisfy(qty) ){
             if( r->type == TYPE_NS ) ntd->respd.has_ns_ans = 1;
             DEBUG("found answer %s %d", r->name.c_str(), r->type);
-            if( ! r->add_answer(ntd, 1) ) return 1;
+            if( ! r->add_answer(ntd, 1, qkl, qty) ) return 1;
 
             if( r->type == TYPE_CNAME && qty != TYPE_CNAME && qty != TYPE_ANY ){
                 // rfc 1034 3.6.2
-                if( ! r->add_add_ans(ntd) ) return 1;
+                if( ! r->add_add_ans(ntd, qkl, qty) ) return 1;
             }
         }
     }
@@ -295,7 +304,7 @@ RRSet::add_answers(NTD *ntd, int qkl, int qty) const {
 }
 
 int
-RR::add_answer(NTD *ntd, bool isq) const{
+RR::add_answer(NTD *ntd, bool isq, int qkl, int qty) const{
 
     if( put_rr(ntd, isq) ){
         ntd->respd.ancount ++;
@@ -307,13 +316,25 @@ RR::add_answer(NTD *ntd, bool isq) const{
     }
 }
 
-// add additional data as answers
 int
-RR::add_add_ans(NTD *ntd) const {
+RR_Alias::add_answer(NTD *ntd, bool isq, int qkl, int qty) const{
+
+    if( ! targ_rrs ){
+        VERBOSE("cannot resolve alias for %s", name.c_str());
+        return 1;
+    }
+
+    targ_rrs->add_answers(ntd, qkl, qty);
+    return 1;
+}
+
+// add additional data as answers (for CNAME)
+int
+RR::add_add_ans(NTD *ntd, int qkl, int qty) const {
 
     for(int j=0; j<additional.size(); j++){
         RR *ra = additional[j];
-        if( ! ra->add_answer(ntd, 0) ) return 1;
+        if( ! ra->add_answer(ntd, 0, qkl, qty) ) return 1;
     }
 
     return 1;

@@ -45,9 +45,9 @@ respond(NTD *ntd, const RRSet *rs, int qty){
         if( ! rr->can_satisfy(qty) )   continue;
         if( ! rr->probe_looks_good() ) continue;
 
-        rr->add_answer(ntd, 1);
+        rr->add_answer(ntd, 1, CLASS_IN, qty);
         if( rr->type == TYPE_CNAME && qty != TYPE_CNAME && qty != TYPE_ANY )
-            rr->add_add_ans(ntd);
+            rr->add_add_ans(ntd, CLASS_IN, qty);
         ok = 1;
     }
 

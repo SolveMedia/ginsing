@@ -3,9 +3,6 @@
   Author: Jeff Weisberg <jaw @ solvemedia.com>
   Created: 2013-Jan-07 11:29 (EST)
   Function: read zone file
- 
-  $Id$
-
 */
 #define CURRENT_SUBSYSTEM	'Z'
 
@@ -73,10 +70,6 @@ bool
 Zone::zonematch(const char *s, int l) const {
 
     return match(s, l, zonename.c_str(), zonename.length());
-
-//    const char *p = strstr(s, zonename.c_str());
-//    if( p && (p - s) + zonename.length() == l ) return 1;
-//    return 0;
 }
 
 //################################################################
@@ -86,6 +79,7 @@ int
 Zone::insert(ZDB *db, RR *rr, string *label){
     bool wildp = rr->wildcard;
 
+    // existing RRSet? add. else create new RRSet
     RRSet *rrs = find_rrset( label, wildp );
     if( ! rrs ){
         rrs = RRSet::make(this, label, wildp, rr->type);
@@ -131,7 +125,7 @@ ZDB::insert(RRSet *rrs){
 RRSet *
 RRSet::make(Zone* z, string *l, bool wp, int type){
 
-    if( (type & 0xFFFF) == type ){
+    if( (type & TYPE_COMPAT_MASK) == type ){
         return new RRSet(z,l,wp);
     }
 
@@ -154,7 +148,7 @@ RRSet::make(Zone* z, string *l, bool wp, int type){
 bool
 RRSet::is_compat(RR *r) const {
     // std rrset - std rrs
-    return (r->type & 0xFFFF == r->type) ? 0 : 1;
+    return (r->type & TYPE_COMPAT_MASK == r->type) ? 0 : 1;
 }
 
 bool
@@ -231,7 +225,7 @@ RR_MX::analyze(Zone *z){
     RRSet *rrs = z->find_rrset( & dest.name, 0 );
     if( ! rrs ) return;
 
-    for(int i=0; i< rrs->rr.size(); i++){
+    for(int i=0; i<rrs->rr.size(); i++){
         RR *rr = rrs->rr[i];
         if( rr->klass != CLASS_IN ) continue;
         if( rr->type == TYPE_A || rr->type == TYPE_AAAA ){
@@ -240,6 +234,32 @@ RR_MX::analyze(Zone *z){
         }
     }
 }
+
+void
+RR_Alias::wire_up(ZDB *db, Zone *z, RRSet *s){
+
+    // same zone?
+    RRSet *rrs = z->find_rrset( & target, 0 );
+    if( ! rrs ) rrs = db->find_rrset( target.c_str() );
+    if( !rrs ){
+        PROBLEM("cannot locate ALIAS target %s => %s", s->fqdn.c_str(), target.c_str());
+        return;
+    }
+
+    DEBUG("found alias %s => %s", s->fqdn.c_str(), target.c_str());
+
+    for(int i=0; i<rrs->rr.size(); i++){
+        RR *r = rrs->rr[i];
+        if( r->type == TYPE_ALIAS ){
+            PROBLEM("cannot ALIAS => ALIAS (%s => %s)", s->fqdn.c_str(), target.c_str());
+            return;
+        }
+    }
+
+    targ_rrs = rrs;
+}
+
+//################################################################
 
 static bool
 zone_compare_length(Zone *a, Zone *b){
@@ -252,10 +272,13 @@ zone_compare_length(Zone *a, Zone *b){
 //   if we host it - ignore the rrs
 //   if we don't   - treat it as a wilcard + handle it
 void
-Zone::wire_ns(ZDB *db){
+Zone::wire_up(ZDB *db){
 
     for(int i=0; i<rrset.size(); i++){
         RRSet *rs = rrset[i];
+
+        rs->wire_up(db, this);
+
         if( ! rs->delegation ) continue;
 
         Zone *z = db->find_zone( rs->fqdn.c_str() );
@@ -272,15 +295,28 @@ Zone::wire_ns(ZDB *db){
     }
 }
 
+void
+RRSet::wire_up(ZDB *db, Zone *z){
+
+    DEBUG("wire up rrset %s", fqdn.c_str());
+    for(int i=0; i<rr.size(); i++){
+        RR *r = rr[i];
+        r->wire_up(db, z, this);
+    }
+}
+
+
+//################################################################
+
 int
 ZDB::analyze(){
 
     // sort zones, longest first
     std::sort( zone.begin(), zone.end(), zone_compare_length );
 
-    // wire NS delegations
+    // wire NS delegations, etc
     for(int i=0; i<zone.size(); i++){
-        zone[i]->wire_ns(this);
+        zone[i]->wire_up(this);
     }
 
 

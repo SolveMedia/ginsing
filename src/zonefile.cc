@@ -260,6 +260,7 @@ struct {
     { "MX",  	  2, TYPE_MX },
     { "PTR",  	  3, TYPE_PTR },
     { "TXT",	  3, TYPE_TXT },
+    { "ALIAS",    5, TYPE_ALIAS },
     { "GLB:RR",	  6, TYPE_GLB_RR },
 //    { "GLB:GEO",  7, TYPE_GLB_GEO },
     { "GLB:MM",   6, TYPE_GLB_MM },

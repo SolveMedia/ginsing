@@ -49,10 +49,14 @@
 #define TYPE_OPT	41	// rfc 2671 7 (edns0)
 #define TYPE_ANY	255	// rfc 1035 3.2.3
 
-#define TYPE_GLB_RR	0x10001
-#define TYPE_GLB_GEO	0x10002
-#define TYPE_GLB_MM	0x10003
-#define TYPE_GLB_Hash	0x10004
+#define TYPE_ALIAS	0x10001
+#define TYPE_GLB_RR	0x20001
+#define TYPE_GLB_GEO	0x20002
+#define TYPE_GLB_MM	0x20003
+#define TYPE_GLB_Hash	0x20004
+
+#define TYPE_COMPAT_MASK	0x1FFFF
+
 
 #define CLASS_IN	1	// rfc 1035 3.2.4
 #define CLASS_CH	3	// rfc 1035 3.2.4

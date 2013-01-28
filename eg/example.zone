@@ -3,7 +3,7 @@
 ;
 
 @       3600    SOA     ns1.example.com. hostmaster.example.com. (
-                                20130163        ; serial
+                                20130166        ; serial
                                 8H              ; refresh
                                 2H              ; retry
                                 4W              ; expire
@@ -12,6 +12,9 @@
                 NS      ns1.example.com.
                 NS      ns2
                 NS      ns3.offsite.com.
+
+                ALIAS   api.solvemedia.com.
+
 
 host1           CNAME   deli1
 host2           CNAME   deli2.example.com.
@@ -43,6 +46,7 @@ sub             NS      ns1.offsite.com.
 
 
 xxx             CNAME   example.com.
+
 
 ; ################################################################
 

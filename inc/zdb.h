@@ -57,17 +57,18 @@ public:
     int set_name(string *);
     void add_probe(Monitor *p){ probe = p; }
     virtual int configure(InputF *, Zone *, string *) = 0;
-    virtual void analyze(Zone *) {}
+    virtual void analyze(Zone *) {}			// when done loading the zone
+    virtual void wire_up(ZDB*, Zone*, RRSet*) {}	// when done loading all the zones
 
-    int add_answer(NTD*, bool)     const;
-    int add_additnl(NTD*)          const;
-    int add_add_ans(NTD*)          const;
-    int put_name(NTD*, bool)       const;
-    int put_rr(NTD*, bool)         const;
-    virtual int _put_rr(NTD*)      const = 0;
-    bool probe_looks_good()        const { return probe_ok; }
-    inline bool can_satisfy(int t) const {
-        return t==type || t==TYPE_ANY || type==TYPE_CNAME;
+    virtual int add_answer(NTD*, bool, int, int) const;
+    int add_additnl(NTD*)              const;
+    int add_add_ans(NTD*, int, int)    const;
+    int put_name(NTD*, bool)           const;
+    int put_rr(NTD*, bool)             const;
+    virtual int _put_rr(NTD*)          const = 0;
+    bool probe_looks_good()            const { return probe_ok; }
+    inline bool can_satisfy(int t)     const {
+        return t==type || t==TYPE_ANY || type==TYPE_CNAME || type==TYPE_ALIAS;
     }
 
     virtual ~RR() {
@@ -178,6 +179,19 @@ public:
     int configure(InputF *, Zone *, string *);
 };
 
+class RR_Alias : public RR {
+    string		target;
+    RRSet		*targ_rrs;
+protected:
+    ~RR_Alias() {};
+    int add_answer(NTD*, bool, int, int) const;
+    void wire_up(ZDB*, Zone*, RRSet *);
+    int _put_rr(NTD*) const {}
+public:
+    RR_Alias(){ targ_rrs = 0; }
+    int configure(InputF *, Zone *, string *);
+};
+
 //################################################################
 
 class RR_GLB : public RR {
@@ -266,6 +280,7 @@ public:
     virtual ~RRSet();
     virtual void add_rr(RR *);
     virtual int analyze(Zone*);
+    void wire_up(ZDB*, Zone *);
     bool wildmatch(const char *, int)       const;
     virtual int add_answers(NTD*, int, int) const;
     virtual int add_additnl(NTD*, int, int) const;
@@ -354,7 +369,7 @@ private:
     int insert(ZDB *, RR*, string *);
     int analyze(ZDB*);
     bool zonematch(const char *, int)      const;
-    void wire_ns(ZDB*);
+    void wire_up(ZDB*);
 
 public:
     RRSet *find_rrset(string *, bool wild) const;
