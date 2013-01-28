@@ -173,6 +173,9 @@ parse_question(NTD *ntd){
         ntd->querd.name[dpos++] = '.';
     }
 
+    if( !dpos )
+        ntd->querd.name[dpos++] = '.';
+
     ntd->querd.name[dpos] = 0;
 
     // process type/class
