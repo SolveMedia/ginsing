@@ -70,8 +70,8 @@ mon_init(void){
 }
 
 static void
-mon_problem(const char *m){
-    PROBLEM(m);
+mon_problem(const char *m, int e){
+    PROBLEM(m, strerror(e));
     restart_requested = 1;
     sleep(10);
 }
@@ -80,7 +80,7 @@ static void*
 mon_console(void *fd){
     console_run(fd);
     close( (int)(long)fd );
-    DEBUG("thread finsihed");
+    DEBUG("thread finished");
 }
 
 static void
@@ -92,7 +92,7 @@ mon_start(void){
 
     int pe = pipe(pfd);
     if( pe == -1 ){
-        mon_problem("cannot create pipe");
+        mon_problem("cannot create pipe: %s", errno);
         return;
     }
 
@@ -100,7 +100,7 @@ mon_start(void){
 
     if( pid == -1 ){
         // uh oh!
-        mon_problem("cannot fork");
+        mon_problem("cannot fork: %s", errno);
         return;
     }
     if( pid == 0 ){
@@ -108,7 +108,7 @@ mon_start(void){
         // cnnect stdout to pipe
         int de = dup2(pfd[1], 1);
         if( de == -1 ){
-            PROBLEM("cannot dup2");
+            PROBLEM("cannot dup2: %s", strerror(errno));
             exit(-1);
         }
         close(pfd[0]);

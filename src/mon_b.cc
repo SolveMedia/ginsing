@@ -57,7 +57,7 @@ Monitor::start(time_t now){
     // fork + exec
     int p = fork();
     if( p == -1 ){
-        PROBLEM("cannot fork");
+        PROBLEM("cannot fork: %s", strerror(errno));
         sleep(5);
         return;
     }
@@ -85,7 +85,7 @@ Monitor::start(time_t now){
     DEBUG("running %s", cmd.c_str(), argv.size());
     execv( cmd.c_str(), (char *const*)eargv );
 
-    PROBLEM("execv %s failed", cmd.c_str());
+    PROBLEM("execv %s failed: %s", cmd.c_str(), strerror(errno));
     exit(-1);
 }
 
@@ -136,6 +136,10 @@ Monitor::abort(){
     kill( pid, (kills++ > 2) ? 9 : 15 );
 }
 
+void
+mon_exit(int sig){
+    exit(0);
+}
 
 // we start here:
 void
@@ -146,7 +150,7 @@ mon_run(void){
     install_handler(SIGHUP,   SIG_DFL);
     install_handler(SIGINT,   SIG_DFL);
     install_handler(SIGQUIT,  SIG_DFL);
-    install_handler(SIGTERM,  SIG_DFL);
+    install_handler(SIGTERM,  mon_exit);
 
     DEBUG("starting");
 
