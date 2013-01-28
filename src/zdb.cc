@@ -298,7 +298,6 @@ Zone::wire_up(ZDB *db){
 void
 RRSet::wire_up(ZDB *db, Zone *z){
 
-    DEBUG("wire up rrset %s", fqdn.c_str());
     for(int i=0; i<rr.size(); i++){
         RR *r = rr[i];
         r->wire_up(db, z, this);
