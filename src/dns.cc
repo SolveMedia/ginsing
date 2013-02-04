@@ -161,7 +161,6 @@ parse_question(NTD *ntd){
         int lablen = *qp ++;
         if( ! lablen ) break;	// done parsing name
 
-        DEBUG("ll %d, dp %d, qp %x, qe %x", lablen, dpos, qp, qe);
         if( lablen < 0 || lablen > MAXLABEL ) return 0;
         if( qp + lablen > qe )                return 0;
         if( dpos + lablen + 1 > MAXNAME )     return 0;
