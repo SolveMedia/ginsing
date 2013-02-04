@@ -13,8 +13,6 @@
                 NS      ns2
                 NS      ns3.offsite.com.
 
-                ALIAS   api.solvemedia.com.
-
 
 host1           CNAME   deli1
 host2           CNAME   deli2.example.com.
