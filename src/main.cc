@@ -142,6 +142,7 @@ static void *
 reload_config(void *file){
     struct stat sb;
     time_t lastmod = lr_now();
+    int    lastino = 0;
 
     while(1){
         sleep(15);
@@ -153,7 +154,9 @@ reload_config(void *file){
 	    continue;
 	}
 
-        if( sb.st_mtime > lastmod || force_reload ){
+        if( !lastino ) lastino = sb.st_ino;
+
+        if( sb.st_mtime > lastmod || force_reload || sb.st_ino != lastino ){
             lastmod = sb.st_mtime;
             force_reload = 0;
             VERBOSE("config changed, reloading");
