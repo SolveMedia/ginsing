@@ -79,8 +79,9 @@ Monitor::start(time_t now){
 
     for(int i=0; i<argv.size(); i++){
         eargv[i+2] = argv[i].c_str();
-        eargv[i+3] = 0;
     }
+
+    eargv[ argv.size() + 2 ] = 0;
 
     DEBUG("running %s", cmd.c_str(), argv.size());
     execv( cmd.c_str(), (char *const*)eargv );
