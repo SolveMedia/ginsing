@@ -146,6 +146,7 @@ send_error_email( const char *msg, int len, int with_trace ){
     char cmd[128];
     const char *mailto;
 
+    if( ! config ) return;
     if( config->error_mailto.empty() ) return;
 
     snprintf(cmd, sizeof(cmd), "env PATH=/usr/lib:/usr/libexec:/usr/sbin:/usr/bin sendmail -t -f '%s'",
