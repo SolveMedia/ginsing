@@ -66,6 +66,14 @@ RRSet_GLB_RR::add_answers(NTD *ntd, int qkl, int qty) const {
 
     if( qkl != CLASS_IN ) return 0;
 
+    switch(qty){
+    case TYPE_A:     case TYPE_AAAA:
+    case TYPE_CNAME: case TYPE_ANY:
+        break;
+    default:
+        return 0;
+    }
+
     INCSTAT(ntd, n_glb);
 
     // randomly pick from available matching records
@@ -130,6 +138,14 @@ int
 RRSet_GLB_MM::add_answers(NTD *ntd, int qkl, int qty) const {
 
     if( qkl != CLASS_IN ) return 0;
+
+    switch(qty){
+    case TYPE_A:     case TYPE_AAAA:
+    case TYPE_CNAME: case TYPE_ANY:
+        break;
+    default:
+        return 0;
+    }
 
     INCSTAT(ntd, n_glb);
 
