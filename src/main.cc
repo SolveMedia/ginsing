@@ -158,6 +158,7 @@ reload_config(void *file){
 
         if( sb.st_mtime > lastmod || force_reload || sb.st_ino != lastino ){
             lastmod = sb.st_mtime;
+            lastino = sb.st_ino;
             force_reload = 0;
             VERBOSE("config changed, reloading");
             read_config( (char*)file );
