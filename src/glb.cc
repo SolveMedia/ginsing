@@ -224,6 +224,8 @@ RRSet_GLB_MM::add_answers_first_match(NTD *ntd, int qty) const {
 
     INCSTAT(ntd, n_glb_nolocation);
 
+    bool typeok = 0;
+
     for(int i=0; i<rr.size(); i++){
         RR_GLB_MM *r = (RR_GLB_MM*) rr[i];
         RRSet *rs = r->comp_rrset;
@@ -232,6 +234,7 @@ RRSet_GLB_MM::add_answers_first_match(NTD *ntd, int qty) const {
         for(int j=0; j<rs->rr.size(); j++){
             RR *rr = rs->rr[j];
             if( ! rr->can_satisfy(qty) )   continue;
+            typeok = 1;
             if( ! rr->probe_looks_good() ) continue;
 
             DEBUG("cannot locate user, using %s", rr->name.c_str());
@@ -240,7 +243,9 @@ RRSet_GLB_MM::add_answers_first_match(NTD *ntd, int qty) const {
         }
     }
 
-    INCSTAT(ntd, n_glb_failover_fail);
+    if( typeok ) INCSTAT(ntd, n_glb_failover_fail);
+    ntd->mmd.logflags |= GLBMM_F_FAILFAIL;
+
     return 0;
 }
 
