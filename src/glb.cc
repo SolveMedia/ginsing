@@ -150,6 +150,7 @@ RRSet_GLB_MM::add_answers(NTD *ntd, int qkl, int qty) const {
     MMElem *mme = ntd->mmd.mm;
     int nelem   = ntd->mmd.nelem;
     int navail  = nelem;
+    bool typeok = 0;
 
     // try to find best match
     for(int i=0; i<nelem; i++){
@@ -171,6 +172,7 @@ RRSet_GLB_MM::add_answers(NTD *ntd, int qkl, int qty) const {
             bool ok = dcok && rr->probe_looks_good();
 
             if( ! rr->can_satisfy(qty) ) continue;
+            typeok = 1;
 
             if( !best && ok ){
                 // best RR is up - use it. done
@@ -195,7 +197,7 @@ RRSet_GLB_MM::add_answers(NTD *ntd, int qkl, int qty) const {
     }
 
     // grumble. best is not available
-    INCSTAT(ntd, n_glb_failover);
+    if( typeok ) INCSTAT(ntd, n_glb_failover);
 
     int res = 0;
     if( best && navail )
@@ -207,7 +209,7 @@ RRSet_GLB_MM::add_answers(NTD *ntd, int qkl, int qty) const {
     if( res ) return res;
 
     // nothing avail
-    INCSTAT(ntd, n_glb_failover_fail);
+    if( typeok ) INCSTAT(ntd, n_glb_failover_fail);
     return 0;
 }
 
