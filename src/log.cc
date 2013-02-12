@@ -101,7 +101,10 @@ log_request(NTD *ntd){
 
 
     // anything else?
-
+    int mmflag = ntd->mmd.logflags;
+    if( mmflag & GLBMM_F_NOLOC )    fprintf(f, " noloc");
+    if( mmflag & GLBMM_F_FAIL  )    fprintf(f, " glbf/o");
+    if( mmflag & GLBMM_F_FAILFAIL ) fprintf(f, " glbf/o/f");
 
     fprintf(f, "\n");
     fclose(f);

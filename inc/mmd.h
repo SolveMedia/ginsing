@@ -109,6 +109,11 @@ public:
 
 class MMD {
 public:
+    uint32_t		logflags;
+#	define GLBMM_F_NOLOC	1
+#	define GLBMM_F_FAIL	2
+#	define GLBMM_F_FAILFAIL	4
+
     int 		nelem;
     MMElem		mm[MAXMMELEM];
 

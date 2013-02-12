@@ -138,6 +138,7 @@ RRSet_GLB_MM::add_answers(NTD *ntd, int qkl, int qty) const {
         weight_and_sort(ntd);
     }else{
         INCSTAT(ntd, n_glb_nolocation);
+        ntd->mmd.logflags |= GLBMM_F_NOLOC;
         // don't know where this user is
         // is there a configured "unknown" record?
         int res = a_a_failover_specify(":unknown", ntd, qty);
@@ -198,6 +199,7 @@ RRSet_GLB_MM::add_answers(NTD *ntd, int qkl, int qty) const {
 
     // grumble. best is not available
     if( typeok ) INCSTAT(ntd, n_glb_failover);
+    ntd->mmd.logflags |= GLBMM_F_FAIL;
 
     int res = 0;
     if( best && navail )
@@ -210,6 +212,7 @@ RRSet_GLB_MM::add_answers(NTD *ntd, int qkl, int qty) const {
 
     // nothing avail
     if( typeok ) INCSTAT(ntd, n_glb_failover_fail);
+    ntd->mmd.logflags |= GLBMM_F_FAILFAIL;
     return 0;
 }
 
