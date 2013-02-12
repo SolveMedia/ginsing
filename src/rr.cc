@@ -149,7 +149,7 @@ RRCompString::set_name(string dest, string *zonename){
     int len = dest.length();
     int pos = len - 1;
 
-    for(int i=len-7; i>0; i--){
+    for(int i=len-8; i>0; i--){
         if( dest[i] == '.' ){
             pos = i;
             break;
@@ -440,37 +440,13 @@ RR_Raw::_put_rr(NTD *ntd) const {
 }
 
 int
-RRCompString::wire_len(NTD *ntd) const {
-
-    if( same_zone ){
-        // name_wire + ptr
-        return name_wire.length() + 2;
-    }else{
-        // RSN - compress
-        // name_wire + dom_wire
-        return name_wire.length() + dom_wire.length();
-    }
-}
-
-int
-RRCompString::put(NTD *ntd) const {
-
-    ntd->respb.put_data((uchar*) name_wire.c_str(), name_wire.length());
-
-    if( same_zone ){
-        ntd->respb.put_short( 0xC000 + ntd->ztab.zpos );	// ptr to zone
-    }else{
-        ntd->respb.put_data((uchar*) dom_wire.c_str(), dom_wire.length());
-    }
-}
-
-int
 RR_Compress::_put_rr(NTD *ntd) const {
 
-    int rdl = rrdata.wire_len(ntd);
+    int zpos = rrdata.find_ztab(ntd);
+    int rdl  = rrdata.wire_len(ntd, zpos);
 
     ntd->respb.put_rr(type, klass, ttl, rdl);
-    rrdata.put(ntd);
+    rrdata.put(ntd, zpos);
 
     return ntd->space_avail(0);
 }
@@ -478,10 +454,11 @@ RR_Compress::_put_rr(NTD *ntd) const {
 int
 RR_MX::_put_rr(NTD *ntd) const {
 
-    int dl = dest.wire_len(ntd);
+    int zpos = dest.find_ztab(ntd);
+    int dl   = dest.wire_len(ntd, zpos);
     ntd->respb.put_rr(type, klass, ttl, dl + 2);
     ntd->respb.put_short(pref);
-    dest.put(ntd);
+    dest.put(ntd, zpos);
 
     return ntd->space_avail(0);
 }
@@ -489,12 +466,14 @@ RR_MX::_put_rr(NTD *ntd) const {
 int
 RR_SOA::_put_rr(NTD *ntd) const {
 
-    int ml = mname.wire_len(ntd);
-    int rl = rname.wire_len(ntd);
+    int mz = mname.find_ztab(ntd);
+    int rz = rname.find_ztab(ntd);
+    int ml = mname.wire_len(ntd, mz);
+    int rl = rname.wire_len(ntd, rz);
 
     ntd->respb.put_rr(type, klass, ttl, ml + rl + 20);
-    mname.put(ntd);
-    rname.put(ntd);
+    mname.put(ntd, mz);
+    rname.put(ntd, rz);
     ntd->respb.put_long( serial  );
     ntd->respb.put_long( refresh );
     ntd->respb.put_long( retry   );
@@ -507,8 +486,49 @@ RR_SOA::_put_rr(NTD *ntd) const {
 
 //################################################################
 
+int
+RRCompString::find_ztab(NTD *ntd) const {
+
+    if( same_zone )
+        return ntd->ztab.zpos;
+
+    // search ztab
+    for(int i=0; i<ntd->ztab.nent; i++){
+        if( ! domain.compare(ntd->ztab.ent[i].name) )
+            return ntd->ztab.ent[i].pos;
+    }
+
+    return 0;
+}
 
 
+int
+RRCompString::wire_len(NTD *ntd, int zpos) const {
 
+    if( zpos ){
+        // compress: name_wire + ptr
+        return name_wire.length() + 2;
+    }else{
+        // name_wire + dom_wire
+        return name_wire.length() + dom_wire.length();
+    }
+}
 
+int
+RRCompString::put(NTD *ntd, int zpos) const {
+
+    ntd->respb.put_data((uchar*) name_wire.c_str(), name_wire.length());
+
+    if( zpos ){
+        ntd->respb.put_short( 0xC000 + zpos );	// ptr to zone
+    }else{
+        // record domain in ztab
+        ntd->ztab.add( domain.c_str(), ntd->respb.datalen );
+        ntd->respb.put_data((uchar*) dom_wire.c_str(), dom_wire.length());
+    }
+
+    return 1;
+}
+
+//################################################################
 

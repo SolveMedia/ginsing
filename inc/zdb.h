@@ -129,8 +129,9 @@ public:
     string	dom_wire;
 
     void set_name(string s, string *);
-    int wire_len(NTD*) const;
-    int put(NTD*)      const;
+    int wire_len(NTD*, int)  const;
+    int put(NTD*, int)       const;
+    int find_ztab(NTD *)     const;
 };
 
 class RR_Compress : public RR {
