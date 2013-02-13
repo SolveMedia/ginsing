@@ -244,6 +244,7 @@ cmd_maint(Console *con, const char *cmd, int len){
         return 1;
     }
 
+    con->output("OK");
     VERBOSE("datacenter %s %s", dc, stat? "OFFLINE" : "ONLINE");
     return 1;
 }

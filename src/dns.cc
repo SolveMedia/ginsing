@@ -342,7 +342,6 @@ static struct {
     { "id.server.",       0, 0,    hostname                },
     { "hostname.server.", 0, 0,    hostname                },
     { "xyzzy.",	          0, 0,    "nothing happens"       },
-    { "plugh.",           0, 0,    "Y2"                    },
     { "load.server.",     1, 'f',  &net_utiliz             },
     { "rps.server.",      1, 'f',  &net_req_per_sec        },
     { "status.server.",   1, 'D',  (void*)&current_runmode },
