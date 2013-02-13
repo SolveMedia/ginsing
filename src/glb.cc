@@ -412,7 +412,7 @@ RRSet_GLB_MM::a_a_failover_specify(const char *dst, NTD *ntd, int qty) const {
     for(int j=0; j<rs->rr.size(); j++){
         const RR *rr = rs->rr[j];
 
-        if( ! rr->probe_looks_good() ) continue;
+        if( ! rr->probe_looks_good() ) continue;	// QQQ - or use anyway?
         if( ! rr->can_satisfy(qty) )   continue;
 
         DEBUG("failover to specified '%s', using %s", dst, rr->name.c_str());
