@@ -54,6 +54,8 @@ log_request(NTD *ntd){
     sockaddr_in *si;
     sockaddr_in6 *ss;
     uchar *addr;
+    time_t now = lr_now();
+    char buf[24];
 
     if( config->logfile.empty() ) return;
 
@@ -66,6 +68,10 @@ log_request(NTD *ntd){
         loglock.unlock();
         return;
     }
+
+    // NB: gmtime is thread safe on solaris
+    strftime(buf, sizeof(buf), "%Y%m%dT%H%M%SZ ", gmtime(&now));
+    fputs(buf, f);
 
     switch( ntd->sa->sa_family ){
     case AF_INET:
