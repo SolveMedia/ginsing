@@ -71,6 +71,11 @@ RR::make(string *lab, int kl, int ty, int tt, bool wild){
 static int
 cvt_name_to_wire(string *src, string *dst){
 
+    if( *src == "." ){
+        dst->assign("\0");
+        return 1;
+    }
+
     dst->assign( " " + *src );
     int pos = 0;
 
@@ -156,17 +161,23 @@ RRCompString::set_name(string dest, string *zonename){
         }
     }
 
+    if( pos == len - 1 ){
+        // name + . => name. + empty
+        pos ++;
+    }
+
     name      = dest.substr(0, pos);
     cvt_name_to_wire(&name, &name_wire);
 
-    if( pos != len - 1 ){
+    DEBUG("pos %d, len %d", pos, len);
+    if( pos != len ){
         domain = dest.substr(pos+1);
         cvt_name_to_wire(&domain, &dom_wire);
         // NB: trailing dot turns into terminating 0
     }
 
-    DEBUG("absol, offsite %s(%d) + %s(%d) -> %s",
-          name.c_str(), name_wire.length(), domain.c_str(), dom_wire.length(), fqdn.c_str());
+    DEBUG("absol, offsite %s => %s(%d) + %s(%d) -> %s",
+          dest.c_str(), name.c_str(), name_wire.length(), domain.c_str(), dom_wire.length(), fqdn.c_str());
 
     return;
 }
@@ -445,6 +456,7 @@ RR_Compress::_put_rr(NTD *ntd) const {
     int zpos = rrdata.find_ztab(ntd);
     int rdl  = rrdata.wire_len(ntd, zpos);
 
+    DEBUG("%s+%s, z %d, l %d", rrdata.name.c_str(), rrdata.domain.c_str(), zpos, rdl );
     ntd->respb.put_rr(type, klass, ttl, rdl);
     rrdata.put(ntd, zpos);
 
@@ -521,7 +533,7 @@ RRCompString::put(NTD *ntd, int zpos) const {
 
     if( zpos ){
         ntd->respb.put_short( 0xC000 + zpos );	// ptr to zone
-    }else{
+    }else if( dom_wire.length() ){
         // record domain in ztab
         ntd->ztab.add( domain.c_str(), ntd->respb.datalen );
         ntd->respb.put_data((uchar*) dom_wire.c_str(), dom_wire.length());
