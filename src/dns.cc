@@ -215,7 +215,7 @@ parse_client_subnet(NTD *ntd, uchar *qs, int optlen){
         break;
     case EDNS0_FAMILY_IPV6:
         if( srcml < 16 || srcml > 128 ) return 0;
-        INCSTAT(ntd, n_client_subnet_ipv4);
+        INCSTAT(ntd, n_client_subnet_ipv6);
         break;
     default:
         return 0;
