@@ -9,13 +9,14 @@
 # $Id$
 
 use Text::CSV;
+use POSIX;
 use Math::Trig qw(deg2rad pi great_circle_distance asin acos);
 
 use strict;
 
-my $OUTFILE = '/home/acdata/dns_mm_ipv6.mdb';
+my $OUTFILE = '/tmp/dns_mm_ipv6.mdb';
 
-my $BLKFILE = '/home/bagel/u/jaw/tmp/GeoLiteCityv6.csv';
+my $BLKFILE = '/home/bagel/u/jaw/mapping/GeoLiteCityv6.csv';
 
 
 my %DC = (
@@ -48,7 +49,7 @@ my @DC = (keys %DC);
 
 ################################################################
 
-open(TMP, "> $OUTFILE.tmp.$$") || fatal("cannot open tmp file: $!");
+open(TMP, "> $OUTFILE.tmp.$$") || die "cannot open tmp file: $!\n";
 binmode(TMP, ':raw');
 # skip header
 syswrite(TMP, "\0" x $HEADSIZE);
@@ -67,7 +68,6 @@ rename "$OUTFILE.tmp.$$", $OUTFILE;
 sub read_blkfile {
 
     open(my $f, $BLKFILE) || die "cannot open file: $!\n";
-    <$f>; <$f>;
 
     my $csv = Text::CSV->new();
 
@@ -80,6 +80,7 @@ sub read_blkfile {
         my $rec = pack('a8sS', ipv6addr($l->[0]), $masklen, 0)
           . join('', map { pack('l', pingtime($_, $DC{$_}, $loc)) } @DC);
 
+        # print STDERR "$l->[0]\t$masklen\n";
         print TMP $rec;
         $nrec ++;
     }
@@ -89,7 +90,7 @@ sub ipv6addr {
     my $ip = shift;
 
     $ip =~ s/::.*//;
-    my @b = split /:/, $ip;
+    my @b = map{ hex } split /:/, $ip;
 
     return join('', map { pack('n', $_) } @b);
 
@@ -99,7 +100,17 @@ sub masklen {
     my $a = shift;
     my $z = shift;
 
-    return 32;
+    $a =~ s/::.*//;
+    my @a = map {hex} split /:/, $a;
+
+    $z =~ s/(:ffff)+//;
+    my @z = map {hex} split /:/, $z;
+
+    my $bs = ceil(log($z[ $#z ] - $a[ $#z ] + 1) / log(2));
+    my $ml = @z * 16 - $bs;
+
+    # print STDERR "$a $z\t$ml ($bs)\n";
+    return $ml;
 }
 
 sub pingtime {
