@@ -35,14 +35,14 @@ out_ipv4(FILE *f, uchar *addr){
 static void
 out_ipv6(FILE *f, uint16_t *addr){
     fprintf(f, "%04X:%04X:%04X:%04X:",
-            addr[0], addr[1], addr[2], addr[3]);
+            htons(addr[0]), htons(addr[1]), htons(addr[2]), htons(addr[3]));
 
     if( !addr[4] && !addr[5] && !addr[6] && addr[7] )
-        fprintf(f, ":%04X", addr[7] );
+        fprintf(f, ":%04X", htons(addr[7]) );
 
     else if( addr[4] || addr[5] || addr[6] || addr[7] )
         fprintf(f, "%04X:%04X:%04X:%04X",
-                addr[4], addr[5], addr[6], addr[7]);
+                htons(addr[4]), htons(addr[5]), htons(addr[6]), htons(addr[7]));
 }
 
 
