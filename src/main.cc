@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 
 
-int flag_foreground   = 0;
+int flag_foreground   = 1;
 int flag_debugall     = 0;
 int force_reload      = 0;
 char *filename_config = 0;
@@ -56,6 +56,7 @@ main(int argc, char **argv){
      int save_argc = argc;
      char **save_argv = argv;
      int checkonly = 0;
+     int tmp_foreground = 0;
      int c;
 
      srandom( time(0) );
@@ -64,7 +65,7 @@ main(int argc, char **argv){
      while( (c = getopt(argc, argv, "c:Cdfh")) != -1 ){
 	 switch(c){
 	 case 'f':
-	     flag_foreground = 1;
+	     tmp_foreground = 1;
 	     break;
 	 case 'd':
 	     flag_debugall = 1;
@@ -78,7 +79,7 @@ main(int argc, char **argv){
 	     break;
          case 'C':
              checkonly = 1;
-             flag_foreground = 1;
+             tmp_foreground = 1;
              break;
 	 }
      }
@@ -94,11 +95,13 @@ main(int argc, char **argv){
      diag_init();
 
      // daemonize
-     if( flag_foreground){
+     if( tmp_foreground){
 	 daemon_siginit();
      }else{
 	 prev_status = daemonize(10, MYNAME "d", save_argc, save_argv);
      }
+
+     flag_foreground = tmp_foreground;
 
      VERBOSE( "starting." );
 
