@@ -16,8 +16,8 @@ udp_threads     5
 tcp_threads     20
 
 # mapping data files
-ipv4data        /tmp/data_ipv4.mdb
-ipv6data        /tmp/data_ipv6.mdb
+ipv4data        /tmp/dns_mm_ipv4.mdb
+ipv6data        /tmp/dns_mm_ipv6.mdb
 
 # monitoring scripts
 monpath         ../monbin
