@@ -260,8 +260,10 @@ parse_edns(NTD *ntd){
     if( qs + rdlen > qz )  return 0;
 
     ntd->edns.udpsize  = udpsize;
-    ntd->respd.maxsize = BOUND(udpsize, 512, MAXUDPEXT);
-    DEBUG("edns udp=%d", udpsize);
+    if( udpsize > ntd->respd.maxsize ){
+        ntd->respd.maxsize = BOUND(udpsize, 512, ntd->respd.maxsize);
+        DEBUG("edns udp=%d", udpsize);
+    }
 
     while(rdlen){
         int optcode = get_short(qs); qs += 2;
