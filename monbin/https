@@ -27,7 +27,7 @@ die "error $addr\n" unless $s;
 $s->print(join('', map{ "$_\r\n" }
                "GET $file HTTP/1.0",
                "Host: $host",
-               "User-Agent: ginsing monitor",
+               "User-Agent: ginsing/dns monitor",
                "Connection: close",
                "Accept: */*",
                "",
