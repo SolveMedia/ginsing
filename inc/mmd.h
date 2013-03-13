@@ -117,7 +117,7 @@ public:
     int 		nelem;
     MMElem		mm[MAXMMELEM];
 
-    MMD(){ memset(this, 0, sizeof(MMD)); }
+    MMD();
 };
 
 

@@ -52,6 +52,10 @@ mmdb_init(void){
 }
 
 //################################################################
+
+MMD::MMD(){ memset(this, 0, sizeof(MMD)); }
+
+
 int
 MMDB::maybe_load_ipv4(void){
 

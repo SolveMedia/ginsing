@@ -3,7 +3,7 @@
 ;
 
 @       3600    SOA     ns1.example.com. hostmaster.example.com. (
-                                20130167        ; serial
+                                20130170        ; serial
                                 8H              ; refresh
                                 2H              ; retry
                                 4W              ; expire
@@ -52,7 +52,7 @@ xxx             CNAME   example.com.
 
 www.ccsphl      120     A               10.0.1.1        {  60 http 80 www.example.com /robots.txt }
 www.qtssjc      120     A               10.0.2.1        {  60 http 80 www.example.com /robots.txt }
-www.savchi      120     A               10.0.3.1        {  60 http } ; default parameters
+www.savchi      120     A               10.0.3.1        {  60 http }
 www.swiams      120     A               10.0.4.1        {  60 http }
 www.nowhere     120     CNAME           www.google.com.
 
@@ -73,8 +73,11 @@ www             120     GLB:MM  	www.qtssjc   qtssjc     1.0  :rrgood
 www             120     GLB:MM          www.savchi   savchi     1.0  :rrgood
 www             120     GLB:MM          www.swiams   swiams     1.0  :rrgood
 
-www             120     GLB:MM          www.savchi   :unknown           ; cannot geo-locate user? use this
-www             120     GLB:MM          www.nowhere  :lastresort        ; all datacenters are down? use this
+; cannot geo-locate user? use this
+www             120     GLB:MM          www.savchi   :unknown
+
+; all datacenters are down? use this
+www             120     GLB:MM          www.nowhere  :lastresort
 
 ; ################################################################
 

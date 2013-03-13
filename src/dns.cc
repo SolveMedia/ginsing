@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 extern void log_request(NTD*);
 

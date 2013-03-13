@@ -22,7 +22,7 @@ inline int with_probability(float p){ return random() < p * 0x7FFFFFFF; }
 
 
 
-#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8
 #  define ATOMIC_SET32(a,b)		((a)  = (b))	// QQQ - are these safe?
 #  define ATOMIC_SET64(a,b)		((a)  = (b))
 #  define ATOMIC_ADD32(a,b)  		__sync_fetch_and_add((uint32_t*)&a, b )

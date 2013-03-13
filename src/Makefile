@@ -15,7 +15,14 @@ MYNAME=ginsing
 
 CFLAGS = -g $(FLAGS) -O3 -ffast-math -pthreads -I`pwd`/../inc -I$(LOCALDIR)/include -DMYNAME=\"$(MYNAME)\"
 CCFLAGS=$(CFLAGS)
+CXXFLAGS=$(CFLAGS)
+
+
+# solaris:
 LDFLAGS = -L$(LOCALDIR)/lib -lpthread -lrt -lsocket -lnsl -lmtmalloc
+
+# netbsd + linux:
+# LDFLAGS = -L$(LOCALDIR)/lib -lpthread
 
 
 all: $(MYNAME)d

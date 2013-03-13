@@ -8,6 +8,7 @@
 #ifndef __acdns_hrtime_h_
 #define __acdns_hrtime_h_
 
+#include <time.h>
 #include <sys/time.h>
 
 #ifndef HAVE_HRTIME
