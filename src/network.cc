@@ -94,7 +94,7 @@ sigalarm(int sig){
 
     // if a lot of things are timing out, something might be hung
     // put the system into a fast windown+restart
-    // if we are not hung, puds::janitor will cancel the shutdown
+    // if we are not hung,  will cancel the shutdown
 
     if( last_timeout + 60 < nowt ){
         // been a while, reset
@@ -124,12 +124,6 @@ sigsegv(int sig){
     DEBUG("caught segv");
 
     // attempt to abort the thread and continue
-
-    // if there is a lock being held, we are f***ed.
-    // if we winddown+restart, we could end up with no running dancrs (aka f***ed)
-
-    // put the system into a fast windown+restart
-    // if we are not hung, puds::janitor will cancel the shutdown
 
     runmode.errored();
 

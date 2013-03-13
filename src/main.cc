@@ -116,7 +116,7 @@ main(int argc, char **argv){
      if( checkonly ) exit(0);
 
      if( prev_status && prev_status != (EXIT_NORMAL_RESTART<<8) ){
-         // previous dancr restarted due to an error - send an email
+         // previous restarted due to an error - send an email
          PROBLEM("previous %sd restarted due to an error (%d)", MYNAME, prev_status);
      }
 
@@ -176,7 +176,7 @@ reload_config(void *file){
 //   main exits
 ///
 // normal winddown:
-//   puds janitor causes runmode transition windown=>exiting
+//   janitor causes runmode transition windown=>exiting
 
 // runmode_manage handles shutting down in the cases
 // where the normal processes are hung
