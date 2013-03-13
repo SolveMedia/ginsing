@@ -268,7 +268,7 @@ MMDB_File::locate(NTD *ntd, const uchar *addr) const {
 
     DEBUG("look for %02x%02x%02x%02x.%02x%02x%02x%02x",
           addr[0], addr[1], addr[2], addr[3],
-          addr[5], addr[6], addr[7], addr[8]);
+          addr[4], addr[5], addr[6], addr[7]);
 
     const MMDFile_Rec *fb = best_rec(addr);
     if( !fb ) return 0;

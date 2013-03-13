@@ -88,7 +88,10 @@ sub read_blkfile {
         my $masklen = masklen( $l->[0], $l->[1] );
         print STDERR "$l->[0] - $l->[1] => $masklen\n" if $masklen > 32 || $masklen < 8;
 
-        my $rec = pack('NNsS', $l->[0], 0, $masklen, 0)
+        my $rec = pack('NNsS',
+                       $l->[0], 0,	# 64bit addr
+                       $masklen,	# masklen
+                       0)		# flags
           . join('', map { pack('l', pingtime($_, $DC{$_}, $loc)) } @DC);
 
         print TMP $rec;
@@ -119,7 +122,7 @@ sub pingtime {
 
 sub haversine {
   my ($lat1, $long1, $lat2, $long2) = @_;
-  my $r = 3956;
+  my $r = 1100;	# ~ millisecs
 
   my $dlong = deg2rad($long1) - deg2rad($long2);
   my $dlat  = deg2rad($lat1)  - deg2rad($lat2);

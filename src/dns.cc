@@ -124,6 +124,7 @@ NTD::fill_header(void){
     DNS_Hdr *qury = (DNS_Hdr*) querb.buf;
     DNS_Hdr *resp = (DNS_Hdr*) respb.buf;
 
+    // 1035 4.1.1 - Recursion Desired - [...] and is copied into the response
     int rd = ntohs(qury->flags) & FLAG_RD;
     respd.flags  |= FLAG_RESPONSE | rd;
 

@@ -1,4 +1,17 @@
 
-DNS server
-open sourced, on github
+GSLB DNS server
+
+features:
+
+  - authoritative only
+  - global server load balancing (aka. geo load balancing)
+  - monitoring + failover for load balancing
+  - edns client subnet support
+  - supports only A,AAAA,CNAME,MX,NS,TXT,SOA,PTR records
+  - high performance (a 1U sun can do > 100k reqs/sec)
+
+
+license:
+  perl artistic license
+
 

@@ -14,7 +14,7 @@ use Math::Trig qw(deg2rad pi great_circle_distance asin acos);
 
 use strict;
 
-my $OUTFILE = '/tmp/dns_mm_ipv6.mdb';
+my $OUTFILE = '/home/acdata/dns_mm_ipv6.mdb';
 
 my $BLKFILE = '/home/bagel/u/jaw/mapping/GeoLiteCityv6.csv';
 

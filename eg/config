@@ -4,28 +4,38 @@
 # Function: example dns server config
 
 
+# what ports?
 port            53
 console         5301
+
+# production, dev, or qa (or ...)?
 environment	prod
 
+# how many worker threads?
 udp_threads     5
 tcp_threads     20
 
+# mapping data files
 ipv4data        /tmp/data_ipv4.mdb
 ipv6data        /tmp/data_ipv6.mdb
 
+# monitoring scripts
 monpath         ../monbin
 
+# log queries?
 logpercent      0
 logfile         /tmp/dnslog
 
+# access to console + stats mib
 allow           10.123.0.0/16
 
+# if there is a problem, send email
 error_mailto	noc@example.com
 error_mailfrom	"DNS Daemon" <nobody@example.com>
 
-debuglevel	8
+# enable debugging?
 
+debuglevel	8
 #debug	        network
 #debug          dns
 #debug          glb
@@ -36,9 +46,11 @@ debuglevel	8
 #debug          mon
 #debug          config
 
-
 # hexdump packets
 #trace           network
+
+
+# configure zones
 
 zone            example.com             ../eg/example.zone
 

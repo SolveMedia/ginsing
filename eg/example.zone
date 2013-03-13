@@ -3,7 +3,7 @@
 ;
 
 @       3600    SOA     ns1.example.com. hostmaster.example.com. (
-                                20130166        ; serial
+                                20130167        ; serial
                                 8H              ; refresh
                                 2H              ; retry
                                 4W              ; expire
@@ -48,25 +48,33 @@ xxx             CNAME   example.com.
 
 ; ################################################################
 
-www.ccsphl      120     A               8.20.87.8       {  60 http 80 www.example.com /robots.txt }
-www.qtssjc      120     A               8.12.155.8      {  60 http 80 www.example.com /robots.txt }
-www.savchi      120     A               10.0.3.1        {  60 http }
+; monitor these via http
+
+www.ccsphl      120     A               10.0.1.1        {  60 http 80 www.example.com /robots.txt }
+www.qtssjc      120     A               10.0.2.1        {  60 http 80 www.example.com /robots.txt }
+www.savchi      120     A               10.0.3.1        {  60 http } ; default parameters
 www.swiams      120     A               10.0.4.1        {  60 http }
 www.nowhere     120     CNAME           www.google.com.
 
 ; ################################################################
+
+; round-robin these records
 
 wwwrr           120     GLB:RR          www.ccsphl
 wwwrr           120     GLB:RR          www.qtssjc
 
 ; ################################################################
 
+; use the configured map-metrics data (see config) to pick the closest record
+
+;                                       record     datacenter weight failover-algorithm
 www             120     GLB:MM  	www.ccsphl   ccsphl     1.0  :rrgood
 www             120     GLB:MM  	www.qtssjc   qtssjc     1.0  :rrgood
 www             120     GLB:MM          www.savchi   savchi     1.0  :rrgood
 www             120     GLB:MM          www.swiams   swiams     1.0  :rrgood
-www             120     GLB:MM          www.savchi   :unknown
-www             120     GLB:MM          www.nowhere  :lastresort
+
+www             120     GLB:MM          www.savchi   :unknown           ; cannot geo-locate user? use this
+www             120     GLB:MM          www.nowhere  :lastresort        ; all datacenters are down? use this
 
 ; ################################################################
 
