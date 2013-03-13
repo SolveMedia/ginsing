@@ -282,7 +282,7 @@ MMDB_File::locate(NTD *ntd, const uchar *addr) const {
           fb->addr[4], fb->addr[5], fb->addr[6], fb->addr[7],
           fb->masklen, fb->flags);
 
-    if( fb->flags & MMDFREC_FLAG_UNKOWN ) return 0;
+    if( fb->flags & MMDFREC_FLAG_UNKNOWN ) return 0;
 
     // copy data
     for(int i=0; i<hdr->n_datacenter; i++){

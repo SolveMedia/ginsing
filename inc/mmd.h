@@ -41,7 +41,7 @@ public:
     uint16_t		flags;
     int32_t		metric[0];	// ...
 
-#  define MMDFREC_FLAG_UNKOWN	1	// location unknown
+#  define MMDFREC_FLAG_UNKNOWN	1	// location unknown
 
 };
 
