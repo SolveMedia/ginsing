@@ -13,10 +13,10 @@ use Math::Trig qw(deg2rad pi great_circle_distance asin acos);
 
 use strict;
 
-my $OUTFILE = '/home/acdata/dns_mm_ipv4.mdb';
+my $OUTFILE = '/tmp/dns_mm_ipv4.mdb';
 
-my $BLKFILE = '/home/bagel/u/jaw/tmp/GeoLiteCity_20130101/GeoLiteCity-Blocks.csv';
-my $LOCFILE = '/home/bagel/u/jaw/tmp/GeoLiteCity_20130101/GeoLiteCity-Location.csv';
+my $BLKFILE = '/tmp/GeoLiteCity_20130101/GeoLiteCity-Blocks.csv';
+my $LOCFILE = '/tmp/GeoLiteCity_20130101/GeoLiteCity-Location.csv';
 
 
 my %DC = (
