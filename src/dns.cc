@@ -317,7 +317,7 @@ add_edns(NTD *ntd){
         ntd->respb.put_short( alen + 4 );
         ntd->respb.put_short( ntd->edns.addr_family );
         ntd->respb.put_byte(  ntd->edns.src_masklen );
-        ntd->respb.put_byte(  ntd->edns.scope_masklen );
+        ntd->respb.put_byte(  ntd->edns.scope_masklen ? ntd->edns.scope_masklen : ntd->edns.src_masklen );
         ntd->respb.put_data(  (uchar*)ntd->edns.addr, alen );
     }
 
