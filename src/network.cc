@@ -80,7 +80,7 @@ hexdump(const uchar *d, int l){
         fprintf(stderr, " %02X", d[i]);
         if( (i%16)==15 && i!=l-1 ) fprintf(stderr, "\n");
     }
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
 }
 
 
