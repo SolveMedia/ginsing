@@ -86,6 +86,7 @@ MMDB::load_ipv4(void){
     ATOMIC_SETPTR( ipv4, tmp );
 
     if( old ){
+        VERBOSE("reloaded ipv4 mm data");
         sleep(5);
         delete old;
     }
@@ -109,6 +110,7 @@ MMDB::load_ipv6(void){
     ATOMIC_SETPTR( ipv6, tmp );
 
     if( old ){
+        VERBOSE("reloaded ipv6 mm data");
         sleep(5);
         delete old;
     }
