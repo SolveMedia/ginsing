@@ -32,6 +32,7 @@
 #include <sys/resource.h>
 
 #define TIMEOUT		10
+#define READ_TIMEOUT	15
 #define ALPHA		0.75
 
 
@@ -47,8 +48,9 @@ public:
     pthread_t pid;
     jmp_buf   jmp_abort;
     DNS_Stats stats;
+    bool      tcpreading;
 
-    Thread_Stats(){ busy = 0; util = 0; timeout = 0; pid = 0; time_update = 0; }
+    Thread_Stats(){ busy = 0; util = 0; timeout = 0; pid = 0; time_update = 0; tcpreading = 0; }
 
 };
 static Thread_Stats *thread_stat;
@@ -259,10 +261,12 @@ network_accept_tcp(void *xthno){
             // disable nagle
             i = 1;
             setsockopt(nfd, IPPROTO_TCP, TCP_NODELAY, &i, sizeof(i));
-            mystat->timeout = lr_now() + TIMEOUT;
+            mystat->timeout    = lr_now() + READ_TIMEOUT;
+            mystat->tcpreading = 1;
 
             if( network_read_tcp(ntd) ){
-                mystat->timeout = lr_now() + TIMEOUT;
+                mystat->tcpreading = 0;
+                mystat->timeout    = lr_now() + TIMEOUT;
                 int rl = dns_process(ntd);
                 DEBUG("response %d", rl);
                 if( config->trace_is_set('N') )
@@ -281,7 +285,8 @@ network_accept_tcp(void *xthno){
             VERBOSE("aborted processing request");
         }
 
-        mystat->timeout = 0;
+        mystat->timeout    = 0;
+        mystat->tcpreading = 0;
 	close(nfd);
         t2 = hr_now();
         calc_util(thno, t0, t1, t2);
@@ -448,7 +453,9 @@ check_threads(time_t nowt){
     // kill any hung threads
     for(int i=0; i<nthread; i++){
         if( thread_stat[i].timeout && thread_stat[i].timeout < nowt ){
-            BUG("notifying unresponsive thread %d", thread_stat[i].pid);
+            if( !thread_stat[i].tcpreading ){
+                BUG("notifying unresponsive thread %d", thread_stat[i].pid);
+            }
             thread_stat[i].timeout = 0;
             pthread_kill(thread_stat[i].pid, SIGALRM);
         }
