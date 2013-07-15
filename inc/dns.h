@@ -85,8 +85,9 @@
 #define RCODE_SHIFT	0
 #define RCODE_MASK      0xf
 
-#define EDNS_OPT_CLIENTSUBNET	0x50FA	// draft-vandergaast-edns-client-subnet
-#define EDNS_OPT_NSID		3	// rfc 5001
+#define EDNS_OPT_CLIENTSUBNET		8	// official number. http://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-11
+#define EDNS_OPT_CLIENTSUBNET_EXP	0x50FA	// experimental.    draft-vandergaast-edns-client-subnet
+#define EDNS_OPT_NSID			3	// rfc 5001
 
 class DNS_Hdr {		// rfc 1035 4.1.1
 public:

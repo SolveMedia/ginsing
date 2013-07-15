@@ -278,6 +278,8 @@ parse_edns(NTD *ntd){
             ntd->edns.nsid = 1;
             break;
         case EDNS_OPT_CLIENTSUBNET:
+        case EDNS_OPT_CLIENTSUBNET_EXP:
+            ntd->edns.optcode = optcode;
             parse_client_subnet(ntd, qs, optlen);
             break;
         default:
@@ -313,7 +315,7 @@ add_edns(NTD *ntd){
 
     if( ntd->edns.addr_family ){
         // client-subnet
-        ntd->respb.put_short( EDNS_OPT_CLIENTSUBNET );
+        ntd->respb.put_short( ntd->edns.optcode );
         ntd->respb.put_short( alen + 4 );
         ntd->respb.put_short( ntd->edns.addr_family );
         ntd->respb.put_byte(  ntd->edns.src_masklen );

@@ -120,6 +120,7 @@ public:
     bool		nsid;		// rfc 5001
 
     // draft-vandergaast-edns-client-subnet
+    int			optcode;	// 8 or 50FA
     int			addr_family;
 #	define EDNS0_FAMILY_IPV4	1
 #	define EDNS0_FAMILY_IPV6	2
