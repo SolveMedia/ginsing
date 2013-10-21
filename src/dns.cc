@@ -256,7 +256,7 @@ parse_edns(NTD *ntd){
     int rdlen   = get_short( qs ); qs += 2;
 
     if( type != TYPE_OPT ) return 0;
-    if( rcver || ez )      return 0;
+    if( rcver )            return 0;
     if( qs + rdlen > qz )  return 0;
 
     ntd->edns.udpsize  = udpsize;
