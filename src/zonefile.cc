@@ -338,7 +338,7 @@ parse_line(InputF *f, string *line, /* out: */ string *label, int *ttl, int *kla
         label->clear();
         for( ; i<len; i++){
             if( isspace(line->at(i)) ) break;
-            label->push_back( line->at(i) );
+            label->push_back( tolower(line->at(i)) );
         }
 
         if( label->at( label->length() - 1 ) == '.' ){
