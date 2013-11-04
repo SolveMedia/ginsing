@@ -114,9 +114,7 @@ daemonize(int to, const char *name, int argc, char **argv){
     // close fd
     close(0);  open("/dev/null", O_RDWR);
     close(1);  open("/dev/null", O_RDWR);
-#ifndef DEBUGING
     close(2);  open("/dev/null", O_RDWR);
-#endif
 
     setsid();
 
