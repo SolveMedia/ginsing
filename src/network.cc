@@ -76,8 +76,9 @@ int myport = 0;
 char hostname[256];
 
 void
-hexdump(const uchar *d, int l){
+hexdump(const char *txt, const uchar *d, int l){
 
+    if( txt ) fprintf(stderr, "%s:\n", txt);
     for(int i=0; i<l; i++){
         fprintf(stderr, " %02X", d[i]);
         if( (i%16)==15 && i!=l-1 ) fprintf(stderr, "\n");
@@ -267,10 +268,14 @@ network_accept_tcp(void *xthno){
             if( network_read_tcp(ntd) ){
                 mystat->tcpreading = 0;
                 mystat->timeout    = lr_now() + TIMEOUT;
+
+                if( config->trace_is_set('N') )
+                    hexdump("tcp recv", ntd->querb.buf, ntd->querb.datalen);
+
                 int rl = dns_process(ntd);
                 DEBUG("response %d", rl);
                 if( config->trace_is_set('N') )
-                    hexdump(ntd->respb.buf, rl);
+                    hexdump("tcp send", ntd->respb.buf, rl);
                 unsigned short tl = htons( rl );
                 if( rl ){
                     iov[0].iov_base = &tl;
@@ -347,7 +352,7 @@ network_accept_udp(void *xthno){
 	DEBUG("new udp request %d, l=%d", thno, i);
 
         if( config->trace_is_set('N') )
-            hexdump(ntd->querb.buf, ntd->querb.datalen);
+            hexdump("udp recv", ntd->querb.buf, ntd->querb.datalen);
 
         if( ! setjmp( mystat->jmp_abort ) ){
 
@@ -357,7 +362,7 @@ network_accept_udp(void *xthno){
             if( rl ) sendto(fd, ntd->respb.buf, rl, 0, (sockaddr*)&sa, sizeof(sa));
 
             if( config->trace_is_set('N') )
-                hexdump(ntd->respb.buf, rl);
+                hexdump("udp send", ntd->respb.buf, rl);
         }else{
             // got a timeout | segv
             VERBOSE("aborted processing request");
