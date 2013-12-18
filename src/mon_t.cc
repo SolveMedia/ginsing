@@ -126,6 +126,7 @@ mon_start(void){
     start_thread( mon_console, (void*)(long)pfd[0] );
 }
 
+// run as thread in main process. start/restart child process to do monitoring
 static void *
 mon_manage(void* x){
     int kills;

@@ -25,6 +25,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
@@ -107,11 +108,18 @@ Monitor::set_status(bool st, int idx){
     DEBUG("send status %d %d %d", idx, uid, status);
     printf("probestatus %d %d %d\n", idx, uid, status);
     fflush(stdout);
+
+    // (non-blockingly) empty the buffer of any recvd data
+    char buf[16];
+    fcntl(1, F_SETFL, O_NDELAY);
+    read(1, buf, sizeof(buf));
+    fcntl(1, F_SETFL, 0);
+
 }
 
 void
 Monitor::wait(int idx, time_t now){
-    int status = 1;;
+    int status = 1;
 
     int w = waitpid(pid, &status, WNOHANG);
     if( !w ) return;	// still running
