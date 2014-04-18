@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 //################################################################
 
@@ -247,7 +248,7 @@ parse_class(InputF *f, string *line, int len, int *i, int *klass){
     return 1;
 }
 
-struct {
+static const struct {
     const char *name;
     int len;
     int value;
