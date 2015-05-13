@@ -39,7 +39,7 @@ clean:
 
 
 ../inc/stats_defs.h: ../tools/mk-stats
-	../tools/mk-stats ../inc/stats_defs.h ../inc/stats_mib.h ../inc/stats_cmd.h
+	perl ../tools/mk-stats ../inc/stats_defs.h ../inc/stats_mib.h ../inc/stats_cmd.h
 
 depend:
 	makedepend -Y -I../inc *.cc
