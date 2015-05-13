@@ -263,7 +263,7 @@ MMDB::locate(NTD *ntd) {
 
     case AF_INET6:
         ss = (sockaddr_in6*)ntd->sa;
-        return mmdb.ipv4 ? mmdb.ipv4->locate(ntd, (uchar*)& ss->sin6_addr) : 0;
+        return mmdb.ipv6 ? mmdb.ipv6->locate(ntd, (uchar*)& ss->sin6_addr) : 0;
     }
 
     return 0;
